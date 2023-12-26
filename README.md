@@ -1,6 +1,6 @@
 # @mateonunez/modulo
 
-A simple tool to manage ESM modules in a CommonJS environment.
+A simple tool to use ESM modules in a CommonJS environment.
 
 ## Install
 

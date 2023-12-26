@@ -17,9 +17,9 @@ async function loadModule (relativePath) {
 
 function Modulo (config) {
   const { path } = config
-  let loadedModule = null
+  let loadedModule
 
-  const loadAndReturnModule = async () => {
+  async function loadAndReturnModule () {
     if (!loadedModule) {
       loadedModule = await loadModule(path)
     }
@@ -37,10 +37,7 @@ function Modulo (config) {
     },
     get: async (_, prop) => {
       const module = await loadAndReturnModule()
-      if (prop in module) {
-        return module[prop]
-      }
-      throw new Error(`Property ${prop} does not exist on the module`)
+      return module[prop]
     }
   })
 }

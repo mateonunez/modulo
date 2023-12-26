@@ -8,4 +8,8 @@ function check2 () {
 
 const foo = 'bar'
 
-export { check, check2, foo }
+const sayHi = () => {
+  return 'Hi!'
+}
+
+export { check, check2, foo, sayHi }

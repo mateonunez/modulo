@@ -4,7 +4,8 @@
   "description": "A simple tool to manage CJS modules in ESM projects",
   "exports": "./modulo.js",
   "scripts": {
-    "test": "standard | snazzy && c8 node --test"
+    "lint": "standard | snazzy",
+    "test": "npm run lint && c8 node --test"
   },
   "keywords": [
     "node",

@@ -63,7 +63,7 @@ If the ESM module you are importing has named exports, the named exports will be
 (async () => {
   const { namedExport1, namedExport2 } = await esmModule("arg1", "arg2");
   console.log(namedExport1);
-  namedExport2();
+  namedExport2(); // If the named export is a function, you can call it like this
 })();
 ```
 

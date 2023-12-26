@@ -4,7 +4,7 @@ const { resolve } = require('node:path')
 
 const moduloCache = {}
 
-async function getModule (relativePath) {
+async function loadModule (relativePath) {
   if (moduloCache[relativePath]) {
     return moduloCache[relativePath]
   }
@@ -15,19 +15,34 @@ async function getModule (relativePath) {
   return _module
 }
 
-module.exports = function (config) {
-  let _Module
+function Modulo (config) {
   const { path } = config
+  let loadedModule = null
 
-  async function getInstance () {
-    if (!_Module) {
-      _Module = await getModule(path)
+  const loadAndReturnModule = async () => {
+    if (!loadedModule) {
+      loadedModule = await loadModule(path)
     }
-    return _Module
+    return loadedModule
   }
 
-  return async function (...args) {
-    const module = await getInstance()
-    return module.default ? module.default(...args) : module
-  }
+  return new Proxy(loadAndReturnModule, {
+    apply: async (_, thisArg, args) => {
+      const module = await loadAndReturnModule()
+      if (typeof module.default === 'function') {
+        return module.default.apply(thisArg, args)
+      }
+
+      return module
+    },
+    get: async (_, prop) => {
+      const module = await loadAndReturnModule()
+      if (prop in module) {
+        return module[prop]
+      }
+      throw new Error(`Property ${prop} does not exist on the module`)
+    }
+  })
 }
+
+module.exports = Modulo

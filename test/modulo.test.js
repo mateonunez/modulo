@@ -54,8 +54,25 @@ test('should return the passed arguments', async (t) => {
 })
 
 test('should import a named export', async (t) => {
-  const esmModule = Modulo({ path: './test/fixtures/esm/named-export.js' })
-  const { check, check2 } = await esmModule()
+  const esmModuleProxy = Modulo({ path: './test/fixtures/esm/named-export.js' })
+  const { check, check2 } = await esmModuleProxy()
+
   assert.strictEqual(check(), true)
   assert.strictEqual(check2(), false)
+})
+
+test('should access a named export', async (t) => {
+  const esmModule = Modulo({ path: './test/fixtures/esm/named-export.js' })
+  const foo = await esmModule.foo
+  assert.strictEqual(foo, 'bar')
+})
+
+test('should throw error for non-existent property', async (t) => {
+  const esmModule = Modulo({ path: './test/fixtures/esm/index.js' })
+  try {
+    await esmModule.nonExistentProp
+    assert.fail('Should have thrown an error for non-existent property')
+  } catch (err) {
+    assert.strictEqual(err.message, 'Property nonExistentProp does not exist on the module')
+  }
 })

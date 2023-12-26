@@ -6,4 +6,6 @@ function check2 () {
   return false
 }
 
-export { check, check2 }
+const foo = 'bar'
+
+export { check, check2, foo }

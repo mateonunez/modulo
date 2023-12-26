@@ -77,4 +77,4 @@ esmModule((err, result) => {
 
 ## License
 
-MIT
+[MIT](./LICENSE)

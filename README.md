@@ -16,7 +16,7 @@ Importing the Module
 First, import @mateonunez/modulo into your Node.js project:
 
 ```js
-const Modulo = require('@mateonunez/modulo');
+const Modulo = require("@mateonunez/modulo");
 ```
 
 ### Importing ESM Modules
@@ -25,7 +25,7 @@ To import an ESM module, use Modulo by providing an object with the path propert
 
 ```js
 const esmModule = Modulo({
-  path: './esm-module.js',
+  path: "./esm-module.js",
 });
 ```
 
@@ -34,15 +34,17 @@ const esmModule = Modulo({
 If the ESM module you are importing has a default export, the default export will be passed to the callback function as the second argument.
 
 ```js
-// No arguments
-esmModule((_, result) => {
+// Without arguments
+(async () => {
+  const result = await esmModule();
   console.log(result);
-});
+})();
 
 // With arguments
-esmModule('arg1', 'arg2', (_, result) => {
+(async () => {
+  const result = await esmModule("arg1", "arg2");
   console.log(result);
-});
+})();
 ```
 
 #### With named exports
@@ -51,14 +53,18 @@ If the ESM module you are importing has named exports, the named exports will be
 
 ```js
 // No arguments
-esmModule((_, { namedExport1, namedExport2 }) => {
-  console.log(namedExport1, namedExport2());
-});
+(async () => {
+  const { namedExport1, namedExport2 } = await esmModule();
+  console.log(namedExport1);
+  namedExport2();
+})();
 
 // With arguments
-esmModule('arg1', 'arg2', (_, { namedExport1, namedExport2 }) => {
-  console.log(namedExport1, namedExport2());
-});
+(async () => {
+  const { namedExport1, namedExport2 } = await esmModule("arg1", "arg2");
+  console.log(namedExport1);
+  namedExport2();
+})();
 ```
 
 ### Error Handling
@@ -66,13 +72,14 @@ esmModule('arg1', 'arg2', (_, { namedExport1, namedExport2 }) => {
 If the ESM module you are importing throws an error, the error will be passed to the callback function as the first argument. If the ESM module you are importing does not throw an error, the first argument will be null.
 
 ```js
-esmModule((err, result) => {
-  if (err) {
-    console.error('Error:', err);
-    return;
+(async () => {
+  try {
+    const result = await esmModule();
+    console.log(result);
+  } catch (err) {
+    console.error("Error:", err);
   }
-  console.log(result);
-});
+})();
 ```
 
 ## License

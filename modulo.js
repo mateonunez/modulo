@@ -2,20 +2,24 @@
 
 const { resolve } = require('node:path')
 
-let Modulo
-function getModule (path, callback) {
-  if (Modulo) {
-    callback(null, Modulo)
+const moduloCache = {}
+
+function getModule (relativePath, callback) {
+  if (moduloCache[relativePath]) {
+    callback(null, moduloCache[relativePath])
     return
   }
 
-  const modulePath = resolve(path)
-  import(modulePath).then(_module => {
-    Modulo = _module
-    callback(null, Modulo)
-  }).catch(err => {
-    callback(err, null)
-  })
+  const modulePath = resolve(process.cwd(), relativePath)
+
+  import(modulePath)
+    .then(_module => {
+      moduloCache[relativePath] = _module
+      callback(null, _module)
+    })
+    .catch(err => {
+      callback(err, null)
+    })
 }
 
 module.exports = function (...args) {

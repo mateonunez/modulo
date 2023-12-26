@@ -62,7 +62,7 @@ test('should import a named export', async (t) => {
 
 test('should access a named export', async (t) => {
   const esmModule = Modulo({ path: './test/fixtures/esm/named-export.js' })
-  const foo = await esmModule.foo
+  const foo = (await esmModule()).foo
   assert.strictEqual(foo, 'bar')
 })
 
@@ -76,4 +76,35 @@ test('should access a named export with arguments', async (t) => {
   const esmModule = Modulo({ path: './test/fixtures/esm/named-export.js' })
   const sayHi = (await esmModule()).sayHi
   assert.strictEqual(sayHi(), 'Hi!')
+})
+
+test('should destruct named exports', async (t) => {
+  {
+    const esmModule = Modulo({ path: './test/fixtures/esm/multiple-exports.js' })
+    const { sleep, pi, ...rest } = await esmModule
+
+    assert.strictEqual(typeof await sleep, 'function')
+    assert.strictEqual(await pi, 3.14159)
+    assert.strictEqual(typeof rest, 'object')
+    assert.strictEqual(JSON.stringify(rest), '{}') // (?)
+  }
+
+  {
+    const esmModule = Modulo({ path: './test/fixtures/esm/multiple-exports.js' })
+    const { sleep, pi, square, greeting } = await esmModule
+
+    assert.strictEqual(typeof await sleep, 'function')
+    assert.strictEqual(await pi, 3.14159)
+    assert.strictEqual(typeof await greeting, 'string')
+    assert.strictEqual(typeof await square, 'function')
+  }
+
+  {
+    const esmModule = Modulo({ path: './test/fixtures/esm/multiple-exports.js' })
+    const resultDefault = await esmModule('CJS')
+
+    assert.strictEqual(resultDefault, 'Hello, CJS!')
+    assert.strictEqual(typeof resultDefault.sleep, 'undefined')
+    assert.strictEqual(typeof resultDefault.pi, 'undefined')
+  }
 })

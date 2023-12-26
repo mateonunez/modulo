@@ -1,6 +1,6 @@
 {
   "name": "@mateonunez/modulo",
-  "version": "0.1.2",
+  "version": "0.2.0",
   "description": "Simple tool to import ESM modules in CommonJS",
   "exports": "./modulo.js",
   "scripts": {

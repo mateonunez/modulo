@@ -105,3 +105,12 @@ test('should return the passed arguments', async (t) => {
     assert.strictEqual(result, 'Hello, CJS!')
   })
 })
+
+test('should import a named export', async (t) => {
+  const esmModule = Modulo({ path: './test/fixtures/esm/named-export.js' })
+  esmModule((err, result) => {
+    if (err) fail(err)
+    assert.strictEqual(result.check(), true)
+    assert.strictEqual(result.check2(), false)
+  })
+})

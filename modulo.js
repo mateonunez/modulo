@@ -19,14 +19,14 @@ function getModule (path, callback) {
 }
 
 module.exports = function (...args) {
-  let _Modulo
+  let _Module
   const { path } = args[0]
 
   function getInstance (...args) {
     const callback = args.pop()
 
-    if (_Modulo) {
-      callback(null, _Modulo)
+    if (_Module) {
+      callback(null, _Module)
       return
     }
 
@@ -36,8 +36,8 @@ module.exports = function (...args) {
         return
       }
 
-      _Modulo = module.default(...args)
-      callback(null, _Modulo)
+      _Module = module.default ? module.default(...args) : module
+      callback(null, _Module)
     })
   }
 

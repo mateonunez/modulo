@@ -4,48 +4,30 @@ const { resolve } = require('node:path')
 
 const moduloCache = {}
 
-function getModule (relativePath, callback) {
+async function getModule (relativePath) {
   if (moduloCache[relativePath]) {
-    callback(null, moduloCache[relativePath])
-    return
+    return moduloCache[relativePath]
   }
 
   const modulePath = resolve(process.cwd(), relativePath)
-
-  import(modulePath)
-    .then(_module => {
-      moduloCache[relativePath] = _module
-      callback(null, _module)
-    })
-    .catch(err => {
-      callback(err, null)
-    })
+  const _module = await import(modulePath)
+  moduloCache[relativePath] = _module
+  return _module
 }
 
-module.exports = function (...args) {
+module.exports = function (config) {
   let _Module
-  const { path } = args[0]
+  const { path } = config
 
-  function getInstance (...args) {
-    const callback = args.pop()
-
-    if (_Module) {
-      callback(null, _Module)
-      return
+  async function getInstance () {
+    if (!_Module) {
+      _Module = await getModule(path)
     }
-
-    getModule(path, (err, module) => {
-      if (err) {
-        callback(err, null)
-        return
-      }
-
-      _Module = module.default ? module.default(...args) : module
-      callback(null, _Module)
-    })
+    return _Module
   }
 
-  return function (...args) {
-    getInstance(...args)
+  return async function (...args) {
+    const module = await getInstance()
+    return module.default ? module.default(...args) : module
   }
 }

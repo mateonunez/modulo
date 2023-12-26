@@ -1,0 +1,27 @@
+{
+  "name": "@mateonunez/modulo",
+  "version": "0.1.0",
+  "description": "A simple tool to manage CJS modules in ESM projects",
+  "exports": "./modulo.js",
+  "scripts": {
+    "test": "standard | snazzy && c8 node --test"
+  },
+  "keywords": [
+    "node",
+    "modulo",
+    "cjs",
+    "esm",
+    "commonjs"
+  ],
+  "author": {
+    "email": "mateonunez95@gmail.com",
+    "name": "Mateo Nunez",
+    "url": "https://github.com/mateonunez"
+  },
+  "license": "MIT",
+  "devDependencies": {
+    "c8": "^8.0.1",
+    "snazzy": "^9.0.0",
+    "standard": "^17.1.0"
+  }
+}

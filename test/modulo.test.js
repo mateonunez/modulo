@@ -86,7 +86,6 @@ test('should destruct named exports', async (t) => {
   {
     const esmModule = await Modulo({ path: './test/fixtures/esm/multiple-exports-without-default.js' })
     const { sleep, pi, ...rest } = esmModule
-
     assert.strictEqual(typeof sleep, 'function')
     assert.strictEqual(pi, 3.14159)
     assert.strictEqual(typeof rest, 'object')
@@ -112,5 +111,14 @@ test('should destruct named exports', async (t) => {
     assert.strictEqual(resultDefault, 'Hello, CJS!')
     assert.strictEqual(resultDefault.sleep, undefined)
     assert.strictEqual(resultDefault.pi, undefined)
+  }
+})
+
+test('should throw if the path is not provided', async (t) => {
+  try {
+    await Modulo()
+    assert.fail('Should have thrown an error')
+  } catch (error) {
+    assert.strictEqual(error.message, 'Modulo requires a path to the module you want to load')
   }
 })

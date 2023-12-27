@@ -13,23 +13,35 @@ npm i @mateonunez/modulo
 ### Default export
 
 ```js
-const modulo = require("@mateonunez/modulo");
+const Modulo = require("@mateonunez/modulo");
 
-const myEsmModule = await modulo({ path: "./my-esm-module.mjs" });
+const myEsmModule = await Modulo({ path: "./my-esm-module.mjs" });
 const result = myEsmModule();
 ```
 
 ### Named export
 
 ```js
-const modulo = require("@mateonunez/modulo");
+const Modulo = require("@mateonunez/modulo");
 
-const { namedExportVar, namedExportFunc } = await modulo({
+const { namedExportVar, namedExportFunc } = await Modulo({
   path: "./my-esm-module.mjs",
 });
 
 console.log(namedExportVar);
 const result = namedExportFunc();
+```
+
+### With TypeScript
+
+```ts
+import Modulo from "@mateonunez/modulo";
+import * as originalEsmModule from "esm-module";
+
+const myEsmModule = await Modulo<typeof originalEsmModule>({
+  path: "./my-esm-module.mjs",
+});
+const result = myEsmModule();
 ```
 
 ### Error handling

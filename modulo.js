@@ -1,45 +1,42 @@
 'use strict'
 
-const { resolve } = require('node:path')
+const path = require('path')
 
-const moduloCache = {}
+const moduleCache = {}
 
-async function loadModule (relativePath) {
-  if (moduloCache[relativePath]) {
-    return moduloCache[relativePath]
+function loadModule (relativePath) {
+  if (moduleCache[relativePath]) {
+    return moduleCache[relativePath]
   }
 
-  const modulePath = resolve(process.cwd(), relativePath)
-  const _module = await import(modulePath)
-  moduloCache[relativePath] = _module
-  return _module
+  const modulePath = path.resolve(process.cwd(), relativePath)
+  const modulePromise = import(modulePath)
+    .then(_module => {
+      moduleCache[relativePath] = _module
+      return _module
+    })
+    .catch(error => {
+      console.error('Error loading module:', error)
+      throw error
+    })
+
+  moduleCache[relativePath] = modulePromise
+  return modulePromise
 }
 
-function Modulo (config) {
-  const { path } = config
-  let loadedModule
+async function Modulo (...args) {
+  const { path } = args[0]
 
-  async function loadAndReturnModule () {
-    if (!loadedModule) {
-      loadedModule = await loadModule(path)
+  const moduleResolver = async (...args) => {
+    const _module = await loadModule(path)
+    if (typeof _module.default === 'function') {
+      return _module.default
     }
-    return loadedModule
+
+    return _module
   }
 
-  return new Proxy(loadAndReturnModule, {
-    apply: async (_, thisArg, args) => {
-      const module = await loadAndReturnModule()
-      if (typeof module.default === 'function') {
-        return module.default.apply(thisArg, args)
-      }
-
-      return module
-    },
-    get: async (_, prop) => {
-      const module = await loadAndReturnModule()
-      return module[prop]
-    }
-  })
+  return await moduleResolver(...args)
 }
 
 module.exports = Modulo

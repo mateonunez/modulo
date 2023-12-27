@@ -1,110 +1,116 @@
 const { test } = require('node:test')
 const assert = require('node:assert/strict')
 const Modulo = require('../modulo.js')
-// const { fail } = require('node:assert')
 
-test('should return a function', (t) => {
-  const esmModule = Modulo({ path: './test/fixtures/esm/index.js' })
+test('should return a function', async (t) => {
+  const esmModule = await Modulo({ path: './test/fixtures/esm/index.js' })
   assert.strictEqual(typeof esmModule, 'function')
 })
 
-test('should return "esm"', async (t) => {
-  const esmModule = Modulo({ path: './test/fixtures/esm/index.js' })
-  assert.strictEqual(await esmModule(), 'esm')
+test('should return "esm"', async () => {
+  // Loading the module
+  const esmModule = await Modulo({ path: './test/fixtures/esm/index.js' })
+
+  const result = esmModule()
+  assert.strictEqual(result, 'esm')
 })
 
 test('should return "esm" with arguments', async (t) => {
-  const esmModule = Modulo({ path: './test/fixtures/esm/index.js' })
-  assert.strictEqual(await esmModule('foo'), 'esm')
+  const esmModule = await Modulo({ path: './test/fixtures/esm/index.js' })
+  assert.strictEqual(esmModule('foo'), 'esm')
 })
 
 test('should return the same instance when called multiple times with the same arguments', async (t) => {
-  const esmModule = Modulo({ path: './test/fixtures/esm/index.js' })
-  const result1 = await esmModule()
-  const result2 = await esmModule()
+  const esmModule = await Modulo({ path: './test/fixtures/esm/index.js' })
+  const result1 = esmModule()
+  const result2 = esmModule()
   assert.strictEqual(result1, result2)
 })
 
 test('should cache the module after the first call', async (t) => {
-  const esmModule1 = Modulo({ path: './test/fixtures/esm/index.js' })
-  const esmModule2 = Modulo({ path: './test/fixtures/esm/index.js' })
-  const result1 = await esmModule1()
-  const result2 = await esmModule2()
+  const esmModule1 = await Modulo({ path: './test/fixtures/esm/index.js' })
+  const esmModule2 = await Modulo({ path: './test/fixtures/esm/index.js' })
+  const result1 = esmModule1()
+  const result2 = esmModule2()
   assert.strictEqual(result1, result2)
 })
 
 test('should handle different argument sets', async (t) => {
-  const esmModule = Modulo({ path: './test/fixtures/esm/index.js' })
-  const result1 = await esmModule('arg1')
-  const result2 = await esmModule('arg2')
+  const esmModule = await Modulo({ path: './test/fixtures/esm/index.js' })
+  const result1 = esmModule('arg1')
+  const result2 = esmModule('arg2')
   assert.strictEqual(result1, result2)
 })
 
 test('should throw an error when the module does not exist', async (t) => {
-  const esmModule = Modulo({ path: './test/fixtures/esm/does-not-exist.js' })
-  await esmModule().catch(err => {
-    assert.strictEqual(err.code, 'ERR_MODULE_NOT_FOUND')
-  })
+  try {
+    await Modulo({ path: './test/fixtures/esm/non-existent.js' })
+    assert.fail('Should have thrown an error')
+  } catch (error) {
+    assert.strictEqual(error.code, 'ERR_MODULE_NOT_FOUND')
+  }
 })
 
 test('should return the passed arguments', async (t) => {
-  const esmModule = Modulo({ path: './test/fixtures/esm/args.js' })
-  const result = await esmModule('Hello, CJS!')
+  const esmModule = await Modulo({ path: './test/fixtures/esm/args.js' })
+  const result = esmModule('Hello, CJS!')
   assert.strictEqual(result, 'Hello, CJS!')
 })
 
 test('should import a named export', async (t) => {
-  const esmModuleProxy = Modulo({ path: './test/fixtures/esm/named-export.js' })
-  const { check, check2 } = await esmModuleProxy()
+  const esmModuleProxy = await Modulo({ path: './test/fixtures/esm/named-export.js' })
+  const { check, check2 } = esmModuleProxy
   assert.strictEqual(check(), true)
   assert.strictEqual(check2(), false)
 })
 
 test('should access a named export', async (t) => {
-  const esmModule = Modulo({ path: './test/fixtures/esm/named-export.js' })
-  const foo = (await esmModule()).foo
+  const esmModule = await Modulo({ path: './test/fixtures/esm/named-export.js' })
+  const foo = esmModule.foo
   assert.strictEqual(foo, 'bar')
 })
 
-test('named exports are available also with the default export', async (t) => {
-  const esmModule = Modulo({ path: './test/fixtures/esm/multiple-exports.js' })
+test('named exports aren\'t available also with the default export', async (t) => {
+  const esmModule = await Modulo({ path: './test/fixtures/esm/multiple-exports.js' })
   assert.strictEqual(typeof esmModule, 'function')
-  assert.strictEqual(typeof await esmModule.sleep, 'function')
+  assert.strictEqual(esmModule.sleep, undefined)
 })
 
 test('should access a named export with arguments', async (t) => {
-  const esmModule = Modulo({ path: './test/fixtures/esm/named-export.js' })
-  const sayHi = (await esmModule()).sayHi
+  const esmModule = await Modulo({ path: './test/fixtures/esm/named-export.js' })
+  const sayHi = esmModule.sayHi
   assert.strictEqual(sayHi(), 'Hi!')
 })
 
 test('should destruct named exports', async (t) => {
   {
-    const esmModule = Modulo({ path: './test/fixtures/esm/multiple-exports.js' })
-    const { sleep, pi, ...rest } = await esmModule
+    const esmModule = await Modulo({ path: './test/fixtures/esm/multiple-exports-without-default.js' })
+    const { sleep, pi, ...rest } = esmModule
 
-    assert.strictEqual(typeof await sleep, 'function')
-    assert.strictEqual(await pi, 3.14159)
+    assert.strictEqual(typeof sleep, 'function')
+    assert.strictEqual(pi, 3.14159)
     assert.strictEqual(typeof rest, 'object')
-    assert.strictEqual(JSON.stringify(rest), '{}') // (?)
+    assert.strictEqual(rest.greeting, 'Hello World')
+    assert.strictEqual(typeof rest.square, 'function')
+    assert.strictEqual(typeof rest.hello, 'object')
   }
 
   {
-    const esmModule = Modulo({ path: './test/fixtures/esm/multiple-exports.js' })
-    const { sleep, pi, square, greeting } = await esmModule
+    const esmModule = await Modulo({ path: './test/fixtures/esm/multiple-exports-without-default.js' })
+    const { sleep, pi, square, greeting } = esmModule
 
-    assert.strictEqual(typeof await sleep, 'function')
-    assert.strictEqual(await pi, 3.14159)
-    assert.strictEqual(typeof await greeting, 'string')
-    assert.strictEqual(typeof await square, 'function')
+    assert.strictEqual(typeof sleep, 'function')
+    assert.strictEqual(pi, 3.14159)
+    assert.strictEqual(typeof greeting, 'string')
+    assert.strictEqual(typeof square, 'function')
   }
 
   {
-    const esmModule = Modulo({ path: './test/fixtures/esm/multiple-exports.js' })
-    const resultDefault = await esmModule('CJS')
+    const esmModule = await Modulo({ path: './test/fixtures/esm/multiple-exports.js' })
+    const resultDefault = esmModule('CJS')
 
     assert.strictEqual(resultDefault, 'Hello, CJS!')
-    assert.strictEqual(typeof resultDefault.sleep, 'undefined')
-    assert.strictEqual(typeof resultDefault.pi, 'undefined')
+    assert.strictEqual(resultDefault.sleep, undefined)
+    assert.strictEqual(resultDefault.pi, undefined)
   }
 })

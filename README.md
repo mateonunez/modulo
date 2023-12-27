@@ -10,77 +10,41 @@ npm i @mateonunez/modulo
 
 ## Usage
 
-The `@mateonunez/modulo` module is designed to handle ESM imports within a CommonJS context. This is particularly useful when you are working in a Node.js application that uses CommonJS modules but need to import ESM modules.
-
-Importing the Module
-First, import @mateonunez/modulo into your Node.js project:
+### Default export
 
 ```js
-const Modulo = require("@mateonunez/modulo");
+const modulo = require("@mateonunez/modulo");
+
+const myEsmModule = await modulo({ path: "./my-esm-module.mjs" });
+const result = myEsmModule();
 ```
 
-### Importing ESM Modules
-
-To import an ESM module, use Modulo by providing an object with the path property. The path should be a string pointing to the ESM module you want to import.
+### Named export
 
 ```js
-const esmModule = Modulo({
-  path: "./esm-module.js",
+const modulo = require("@mateonunez/modulo");
+
+const { namedExportVar, namedExportFunc } = await modulo({
+  path: "./my-esm-module.mjs",
 });
+
+console.log(namedExportVar);
+const result = namedExportFunc();
 ```
 
-#### With default export
-
-If the ESM module you are importing has a default export, the default export will be passed to the callback function as the second argument.
+### Error handling
 
 ```js
-// Without arguments
-(async () => {
-  const result = await esmModule();
-  console.log(result);
-})();
+const modulo = require("@mateonunez/modulo");
 
-// With arguments
-(async () => {
-  const result = await esmModule("arg1", "arg2");
-  console.log(result);
-})();
-```
-
-#### With named exports
-
-If the ESM module you are importing has named exports, the named exports will be passed to the callback function as the second argument.
-
-```js
-// No arguments
-(async () => {
-  const { namedExport1, namedExport2 } = await esmModule();
-  console.log(namedExport1);
-  namedExport2();
-})();
-
-// With arguments
-(async () => {
-  const { namedExport1, namedExport2 } = await esmModule("arg1", "arg2");
-  console.log(namedExport1);
-  namedExport2(); // If the named export is a function, you can call it like this
-})();
-```
-
-### Error Handling
-
-If the ESM module you are importing throws an error, the error will be passed to the callback function as the first argument. If the ESM module you are importing does not throw an error, the first argument will be null.
-
-```js
-(async () => {
-  try {
-    const result = await esmModule();
-    console.log(result);
-  } catch (err) {
-    console.error("Error:", err);
+const myEsmModule = await modulo({ path: "./my-esm-module.mjs" }).catch(
+  (err) => {
+    console.error(err);
   }
-})();
+);
 ```
+
+> Note: if your ESM module exports a default export and named exports, you can use only the default export.
 
 ## License
 

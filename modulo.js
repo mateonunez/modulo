@@ -4,24 +4,19 @@ const path = require('path')
 
 const moduleCache = {}
 
-function loadModule (relativePath) {
+async function loadModule (relativePath) {
   if (moduleCache[relativePath]) {
     return moduleCache[relativePath]
   }
 
   const modulePath = path.resolve(process.cwd(), relativePath)
-  const modulePromise = import(modulePath)
-    .then(_module => {
-      moduleCache[relativePath] = _module
-      return _module
-    })
-    .catch(error => {
-      console.error('Error loading module:', error)
-      throw error
-    })
+  const module = await import(modulePath).catch(error => {
+    console.error('Error loading module:', error)
+    throw error
+  })
 
-  moduleCache[relativePath] = modulePromise
-  return modulePromise
+  moduleCache[relativePath] = module
+  return module
 }
 
 async function Modulo (options = {}) {

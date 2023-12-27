@@ -3,10 +3,13 @@
   "version": "0.3.0",
   "description": "Simple tool to import ESM modules in CommonJS",
   "exports": "./modulo.js",
+  "types": "./modulo.d.ts",
   "scripts": {
     "lint": "standard | snazzy",
     "lint:fix": "standard --fix | snazzy",
-    "test": "npm run lint && c8 node --test"
+    "test": "npm run lint && npm run test:unit && npm run test:typescript",
+    "test:unit": "c8 node --test",
+    "test:typescript": "tsd"
   },
   "keywords": [
     "node",
@@ -24,9 +27,14 @@
   "devDependencies": {
     "c8": "^8.0.1",
     "snazzy": "^9.0.0",
-    "standard": "^17.1.0"
+    "standard": "^17.1.0",
+    "tsd": "^0.30.1",
+    "typescript": "^5.3.3"
   },
   "publishConfig": {
     "access": "public"
+  },
+  "tsd": {
+    "directory": "test/types"
   }
 }

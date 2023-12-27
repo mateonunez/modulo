@@ -24,11 +24,13 @@ function loadModule (relativePath) {
   return modulePromise
 }
 
-async function Modulo (...args) {
-  const { path } = args[0]
+async function Modulo (options = {}) {
+  if (!options.path) {
+    throw new Error('Modulo requires a path to the module you want to load')
+  }
 
-  const moduleResolver = async () => {
-    const _module = await loadModule(path)
+  const moduleResolver = async (...args) => {
+    const _module = await loadModule(options.path)
     if (typeof _module.default === 'function') {
       return _module.default
     }
@@ -36,7 +38,7 @@ async function Modulo (...args) {
     return _module
   }
 
-  return await moduleResolver()
+  return await moduleResolver(options)
 }
 
 module.exports = Modulo

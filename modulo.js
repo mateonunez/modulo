@@ -27,7 +27,7 @@ function loadModule (relativePath) {
 async function Modulo (...args) {
   const { path } = args[0]
 
-  const moduleResolver = async (...args) => {
+  const moduleResolver = async () => {
     const _module = await loadModule(path)
     if (typeof _module.default === 'function') {
       return _module.default
@@ -36,7 +36,7 @@ async function Modulo (...args) {
     return _module
   }
 
-  return await moduleResolver(...args)
+  return await moduleResolver()
 }
 
 module.exports = Modulo

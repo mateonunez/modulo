@@ -1,5 +1,4 @@
 export default function greet (name) {
-  console.log('not here')
   return `Hello, ${name}!`
 }
 
